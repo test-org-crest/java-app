@@ -1,33 +1,30 @@
-# 2020-JAVA-HRMS
+## What is it?
+This source code is an Spring Boot web application (mvc + thymeleaf).
+ 
+Tested with
+* Docker 19.03
+* Ubuntu 19
+* Java 8 or Java 11
+* Spring Boot 2.2.4.RELEASE
+* Maven
 
+For explanation, please visit this article - [Docker and Spring Boot](https://mkyong.com/docker/docker-spring-boot-examples/)
 
-Employee Service: 
-Use Cases:
-Add/Update/Delete Employee Information
-Add/Update/Delete Employee Family Information
-Add/Update/Delete Employee Experience information
+## How to run this?
+```bash
+$ git clone https://github.com/mkyong/docker-java
+$ cd docker-spring-boot
+$ mvn clean package
+$ java -jar target/spring-boot-web.jar
 
-ORM: JPA Repository
+  access http://localhost:8080
 
-Leave Management:
-Use Cases : Employee :
-Apply/Update/Cancel Leave
-Leave History applied by Employee
+//dockerize
 
-Use Cases : Manager :
-Applied Leave List
-Approve/Reject Leaves
+// create a docker image
+$ sudo docker build -t spring-boot:1.0 .
+// run it
+$ sudo docker run -d -p 8080:8080 -t spring-boot:1.0
 
-ORM: Hibernate with Generic Dao, Programatic transactions 
-
-Employee CheckIn/Out Service:
-Use Cases : 
-Check In
-Check Out 
-
-ORM: Hibernate with Transaction manager configuration, HibernateTemplate, Declarative transactions 
-
-
-
-
-
+  access http://localhost:8080
+```
