@@ -1,0 +1,13 @@
+name: "Hit the REST API"
+on:
+  push:
+    branches:
+      - main
+jobs:
+  run-updater:
+    runs-on: update-latest
+    steps:
+      - name: REST API Call with curl
+        run:
+          response = $(curl 'https://testapi1.propelo.ai/v1/integrations/list' \ -H 'authority: testapi1.propelo.ai' \ -H 'accept: application/json, text/plain, */*' \ -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \ -H 'authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJtZWV0cmFqc2luaC5zb2xhbmtpQGNyZXN0ZGF0YXN5cy5jb20iLCJ1c2VyX3R5cGUiOiJBRE1JTiIsImNvbXBhbnkiOiJmb28iLCJleHAiOjE2OTY1ODk3NDksImlhdCI6MTY5NjU3MTc0OX0.ZhUdhHJJjws-4pr7xwRS6wS1z04g8tWr6SWxaT17vmZHNs_S1R2BG72CZW8dB0_8' \ -H 'content-type: application/json' \ -H 'origin: https://testui1.propelo.ai' \ -H 'referer: https://testui1.propelo.ai/' \ -H 'sec-ch-ua: "Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"' \ -H 'sec-ch-ua-mobile: ?0' \ -H 'sec-ch-ua-platform: "macOS"' \ -H 'sec-fetch-dest: empty' \ -H 'sec-fetch-mode: cors' \ -H 'sec-fetch-site: same-site' \ -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' \ --data-raw '{"page":0,"page_size":10,"filter":{}}' \ --compressed)
+          echo "resonse from curl = $response"
