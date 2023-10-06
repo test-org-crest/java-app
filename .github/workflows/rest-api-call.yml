@@ -15,6 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: REST API Call with curl
-        run:
+        run: |
           curl 'https://testapi1.propelo.ai/v1/tags/list' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'authorization:Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJtZWV0cmFqc2luaC5zb2xhbmtpQGNyZXN0ZGF0YXN5cy5jb20iLCJ1c2VyX3R5cGUiOiJBRE1JTiIsImNvbXBhbnkiOiJmb28iLCJleHAiOjE2OTY1ODk3NDksImlhdCI6MTY5NjU3MTc0OX0.ZhUdhHJJjws-4pr7xwRS6wS1z04g8tWr6SWxaT17vmZHNs_S1R2BG72CZW8dB0_8' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"filter":{"tag_ids":["684","685","686","687"]}}' --compressed --globoff
           curl 'https://651fd848906e276284c39b13.mockapi.io/api/v1/Artifact' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'content-type:application/json' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"image_name":"${{ env.IMAGE_NAME }}","image_tag":"${{ env.TAG }}","image_url":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}","id":"2"}' --compressed --globoff
