@@ -5,7 +5,7 @@ on:
       - main
 jobs:
   run-updater:
-    runs-on: update-latest
+    runs-on: ubuntu-latest
     steps:
       - name: REST API Call with curl
         run:
