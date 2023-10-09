@@ -25,7 +25,7 @@ jobs:
       - name: REST API Call with curl
         id: curls
         run:
-          curl 'https://testapi1.propelo.ai/v1/tags/list' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'authorization:Bearer ${{ steps.auth.outputs.token }}' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"filter":{"tag_ids":["684","685","686","687"]}}' --compressed --globoff -o tags.json
+          curl 'https://testapi1.propelo.ai/v1/tags/list' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'authorization:Bearer '${{ steps.auth.outputs.token }} -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"filter":{"tag_ids":["684","685","686","687"]}}' --compressed --globoff -o tags.json
       - name: Read tag id
         id: tag_id
         run: echo "id=$(cat tags.json | jq -c '.records[0].id')" >> "$GITHUB_OUTPUT"
