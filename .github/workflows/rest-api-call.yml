@@ -23,6 +23,7 @@ jobs:
       - name: print token
         run: echo ${{ steps.auth.outputs.token }}
   run-updater:
+    needs: authenticate
     runs-on: ubuntu-latest
     steps:
       - name: REST API Call with curl
