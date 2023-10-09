@@ -22,12 +22,14 @@ jobs:
         run: echo "token=$(cat auth.json | jq -c '.token')" >> $GITHUB_OUTPUT
       - name: print token
         run: echo ${{ steps.auth.outputs.token }}
+    outputs:
+      TOKEN: ${{ steps.auth.outputs.token }}
   run-updater:
     needs: authenticate
     runs-on: ubuntu-latest
     steps:
       - name: print token from authentication
-        run: echo "token ${{ needs.authenticate.auth.outputs.token }}"
+        run: echo "token ${{ needs.authenticate.outputs.TOKEN }}"
       - name: REST API Call with curl
         id: curls
         run: |
