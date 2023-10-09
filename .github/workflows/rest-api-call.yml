@@ -23,7 +23,9 @@ jobs:
         env:
           AUTH_TOKEN: ${{steps.auth.outputs.token}}
       - name: Print auth token
-        run: echo "token ${{env.AUTH_TOKEN}}"
+        run: |
+          echo "token ${{env.AUTH_TOKEN}}"
+          echo "auth ${{steps.auth.outputs.token}}"
       - name: REST API Call with curl
         id: curls
         run: |
