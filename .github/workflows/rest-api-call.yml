@@ -23,7 +23,7 @@ jobs:
       - name: Print auth token
         run: |
           echo ${{steps.auth.outputs.token}}
-          echo ${{GITHUB_RUN_NUMBER}}
+          echo "${{ github.run_id }} ${{github.run_number}} ${{github.run_attempt}}"
       - name: REST API Call with curl
         id: curls
         run:
