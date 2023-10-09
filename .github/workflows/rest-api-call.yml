@@ -21,7 +21,7 @@ jobs:
         id: auth
         run: echo "token=$(cat auth.json | jq -c '.token' | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
       - name: print token
-        run: "$( echo ${{ steps.auth.outputs.token }} | base64 -di )"
+        run: echo "auth_token=$( echo ${{ steps.auth.outputs.token }} | base64 -di )"
   run-updater:
     needs: authenticate
     runs-on: ubuntu-latest
