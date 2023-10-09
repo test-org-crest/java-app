@@ -22,5 +22,5 @@ jobs:
         id: tag_id
         run: echo "::set-output name=id::$(cat tags.json | jq -c '.records[0]. | select().id')"
       - name: print tag
-        run: echo ${{ stesp.tag_id.outputs.id }}
+        run: echo ${{ steps.tag_id.outputs.id }}
         
