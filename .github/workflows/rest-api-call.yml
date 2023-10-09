@@ -19,17 +19,15 @@ jobs:
         run: curl 'https://testapi1.propelo.ai/v1/authenticate' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'sec-ch-ua:"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"' -H 'sec-ch-ua-mobile:?0' -H 'sec-ch-ua-platform:"macOS"' -H 'sec-fetch-dest:empty' -H 'sec-fetch-mode:cors' -H 'sec-fetch-site:same-site' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"username":"meetrajsinh.solanki@crestdatasys.com","password":"devpropelo@123","company":"foo"}' --compressed --globoff -o auth.json
       - name: Read auth
         id: auth
-        run: echo "token=$(cat auth.json | jq -c '.token')" >> $GITHUB_OUTPUT
+        run: echo "token=$(cat auth.json | jq -c '.token')" >> $GITHUB_ENV
       - name: print token
         run: echo ${{ steps.auth.outputs.token }}
-    outputs:
-      TOKEN: ${{ steps.auth.outputs.token }}
   run-updater:
     needs: authenticate
     runs-on: ubuntu-latest
     steps:
       - name: print token from authentication
-        run: echo "token ${{ needs.authenticate.outputs.TOKEN }}"
+        run: echo "token ${{ env.token }}"
       - name: REST API Call with curl
         id: curls
         run: |
