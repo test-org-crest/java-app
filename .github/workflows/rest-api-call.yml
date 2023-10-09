@@ -19,25 +19,15 @@ jobs:
         run: curl 'https://testapi1.propelo.ai/v1/authenticate' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'sec-ch-ua:"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"' -H 'sec-ch-ua-mobile:?0' -H 'sec-ch-ua-platform:"macOS"' -H 'sec-fetch-dest:empty' -H 'sec-fetch-mode:cors' -H 'sec-fetch-site:same-site' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"username":"meetrajsinh.solanki@crestdatasys.com","password":"devpropelo@123","company":"foo"}' --compressed --globoff -o auth.json
       - name: Read auth
         id: auth
-        run: echo "token=$(cat auth.json | jq -c '.token' | base64 -w0 | base64 -w0)" >> $GITHUB_OUTPUT
-      - name: print token
-        run: echo "auth_token=$( echo ${{ steps.auth.outputs.token }} | base64 -di | base64 -di)"
-  run-updater:
-    needs: authenticate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Token from authenticate job
-        id: get_token
-        run: echo "token=$( echo ${{ needs.authenticate.auth.outputs.token }} | base64 -di | base64 -di)" >> $GITHUB_OUTPUT
-      - name: print token
-        run: |
-          echo "auth_token=$( echo ${{ needs.authenticate.auth.outputs.token }} | base64 -di | base64 -di)"
-          echo "TOKEN: ${{ steps.get_token.outputs.token }}"
-          echo ::add-mask::${{ steps.get_token.outputs.token }}
+        run: echo "token=$(cat auth.json | jq -c '.token')" >> $GITHUB_OUTPUT
+        env:
+          AUTH_TOKEN: ${{token}}
+      - name: Print auth token
+        run: echo "token ${{env.AUTH_TOKEN}}"
       - name: REST API Call with curl
         id: curls
         run: |
-          curl 'https://testapi1.propelo.ai/v1/tags/list' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'authorization:Bearer ${{ steps.get_token.outputs.token }}' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"filter":{"tag_ids":["684","685","686","687"]}}' --compressed --globoff -o tags.json
+          curl 'https://testapi1.propelo.ai/v1/tags/list' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'authorization:Bearer ${{ env.AUTH_TOKEN }}' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"filter":{"tag_ids":["684","685","686","687"]}}' --compressed --globoff -o tags.json
       - name: Read tag id
         id: tag_id
         run: echo "id=$(cat tags.json | jq -c '.records[0].id')" >> $GITHUB_OUTPUT
