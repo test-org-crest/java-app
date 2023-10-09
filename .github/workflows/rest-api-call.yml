@@ -26,6 +26,8 @@ jobs:
     needs: authenticate
     runs-on: ubuntu-latest
     steps:
+      - name: print token from authentication
+        run: echo "token ${{ needs.authenticate.auth.outputs.token }}"
       - name: REST API Call with curl
         id: curls
         run: |
