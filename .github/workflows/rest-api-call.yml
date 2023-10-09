@@ -23,7 +23,7 @@ jobs:
         env:
           AUTH_TOKEN: ${{ steps.auth.outputs.token }}
       - name: print token
-        run: echo ${{ env.token }}
+        run: echo ${{ steps.auth.outputs.token }}
   run-updater:
     needs: authenticate
     runs-on: ubuntu-latest
