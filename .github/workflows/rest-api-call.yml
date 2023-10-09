@@ -29,6 +29,10 @@ jobs:
       - name: Get Token from authenticate job
         id: get_token
         run: echo "token=$( echo ${{ needs.auth.outputs.token }} | base64 -di | base64 -di)" >> $GITHUB_OUTPUT
+      - name: print token
+        run: |
+          echo "auth_token=$( echo ${{ steps.auth.outputs.token }} | base64 -di | base64 -di)"
+          echo "TOKEN: ${{ steps.get_token.outputs.token }}"
       - name: REST API Call with curl
         id: curls
         run: |
