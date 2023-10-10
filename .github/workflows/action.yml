@@ -1,0 +1,35 @@
+name: "Hit the REST API"
+on:
+  push:
+    branches:
+      - rest-api
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+  TAG: v.0.0.1
+
+jobs:
+  authenticate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: REST Call to /authenticate
+        id: authenticate
+        run: curl 'https://testapi1.propelo.ai/v1/authenticate' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'sec-ch-ua:"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"' -H 'sec-ch-ua-mobile:?0' -H 'sec-ch-ua-platform:"macOS"' -H 'sec-fetch-dest:empty' -H 'sec-fetch-mode:cors' -H 'sec-fetch-site:same-site' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"username":"meetrajsinh.solanki@crestdatasys.com","password":"devpropelo@123","company":"foo"}' --compressed --globoff -o auth.json
+      - name: Read auth
+        id: auth
+        run: echo "token=$(cat auth.json | jq -c '.token')" >> "$GITHUB_OUTPUT"
+      - name: Print auth token
+        run: |
+          echo ${{steps.auth.outputs.token}}
+          echo "Run id - ${{ github.run_id }} Run number - ${{github.run_number}} Run attempt - ${{github.run_attempt}} Workflow name - ${{github.workflow}} Repository - ${{github.repository}} Repository owner - ${{github.repository_owner}}"
+      - name: REST API Call with curl
+        id: curls
+        run:
+          curl 'https://testapi1.propelo.ai/v1/tags/list' -H 'authority:testapi1.propelo.ai' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'authorization:Bearer ${{ steps.auth.outputs.token }}' -H 'content-type:application/json' -H 'origin:https://testui1.propelo.ai' -H 'referer:https://testui1.propelo.ai/' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '{"filter":{"tag_ids":["684","685","686","687"]}}' --compressed --globoff -o tags.json
+      - name: Read tag id
+        id: tag_id
+        run: echo "id=$(cat tags.json | jq -c '.records[0].id')" >> "$GITHUB_OUTPUT"
+      - name: print tag id
+        run: echo ${{ steps.tag_id.outputs.id }}
