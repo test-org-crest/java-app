@@ -20,6 +20,8 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
+  INTEGRATION_ID: 1
+  TENANT: foo
 
 
 jobs:
@@ -96,3 +98,15 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+        
+      - name: REST API Call to push artifacts to SEI
+        id: push_artifacts
+        env:
+          registry: ${{ env.REGISTRY }}
+          image_name: ${{ env.IMAGE_NAME }}
+          tag: ${{ steps.meta.outputs.tags }}
+          job_run_number: ${{github.run_number}}
+          job_name: ${{github.workflow}}
+          repository: ${{github.repository}}
+          payload: '{"job_run_number":"${{ env.job_run_number }}", "job_name":"${{ env.job_name }}", "image_name":"${{ env.image_namne }}", "image_url":"${{ env.registry }}/${{ env.image_name }}", "image_tag":"${{ env.tag }}", "integration_id":"${{ env.INTEGRATION_ID }}", "tenant":"${{ env.TENANT }}", "repository":"${{ env.repository }}"}'
+        run: curl 'https://651fd848906e276284c39b13.mockapi.io/api/v1/Response' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'content-type:application/json' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '${{ env.payload }}' --compressed --globoff -o response.json
