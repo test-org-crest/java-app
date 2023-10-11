@@ -102,7 +102,7 @@ jobs:
       - name: Preparing Payload to push artifacts
         id: payload
         env:
-          registry: ${{ env.REGISTRY }}
+          registry: "my_registry ${{ env.REGISTRY }}"
           image_name: ${{ env.IMAGE_NAME }}
           tag: ${{ steps.meta.outputs.tags }}
           job_run_number: ${{ github.run_number }}
