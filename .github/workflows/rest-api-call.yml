@@ -15,14 +15,14 @@ env:
   JOB_RUN_NUMBER: ${{github.run_number}}
   JOB_NAME: ${{github.workflow}}
   REPOSITORY: ${{github.repository}}
-  API_KEY: ${{ secrets.API_KEY }}
+  API_KEY: ${{ secrets.SEI_API_KEY }}
 
 jobs:
   authenticate:
     runs-on: ubuntu-latest
     steps:
       - name: print api-key
-        run: echo "api_key ${{ secrets.API_KEY }}"
+        run: echo "api_key ${{ secrets.SEI_API_KEY }}"
       - name: REST API Call to push artifacts to SEI
         id: push_artifacts
         env:
