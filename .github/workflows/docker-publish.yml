@@ -108,6 +108,7 @@ jobs:
           job_run_number: ${{github.run_number}}
           job_name: ${{github.workflow}}
           repository: ${{github.repository}}
+        run: echo "Data Collected..."
         
       - name: REST API Call to push artifacts to SEI
         id: push_artifacts
