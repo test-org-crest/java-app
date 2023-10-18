@@ -1,4 +1,5 @@
 name: "Hit the REST API"
+run-name: "Hit the REST API : run-name"
 on:
   push:
     branches:
