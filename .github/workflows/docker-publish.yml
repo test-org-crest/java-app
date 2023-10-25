@@ -148,4 +148,4 @@ jobs:
         id: push_params
         env:
           payload: '{"integration_id":"${{ env.INTEGRATION_ID }}","repository":"${{ steps.payload_params.outputs.repository }}","job_run_number":"${{ steps.payload_params.outputs.job_run_number }}","job_name":"${{ steps.payload_params.outputs.job_name }}","params":[{"name":"${{ steps.payload_params.outputs.name }}","type":"${{steps.payload_params.outputs.type}}","value":"${{steps.payload_params.outputs.value}}"}]}'
-        run: curl 'https://testapi1.propelo.ai/v1/cicd/push_job_run_params' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload_params }}' --compressed --globoff
+        run: curl 'https://testapi1.propelo.ai/v1/cicd/push_job_run_params' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
