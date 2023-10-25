@@ -20,8 +20,7 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  INTEGRATION_ID: 1
-  TENANT: foo
+  INTEGRATION_ID: 4717
 
 
 jobs:
@@ -99,18 +98,18 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
-      - name: Current Time
-        id: current_time
-        run: echo "now=$(date)" >> $GITHUB_OUTPUT 
       - name: Preparing Payload to push artifacts
         id: payload
         env:
-          registry: "my_registry ${{ env.REGISTRY }}"
+          registry: ${{ env.REGISTRY }}
           image_name: ${{ env.IMAGE_NAME }}
           tag: ${{ steps.meta.outputs.tags }}
           job_run_number: ${{ github.run_number }}
           job_name: ${{ github.workflow }}
           repository: ${{ github.repository }}
+          digest: ${{ steps.build-and-push.outputs.digest }}
+          type: "type1"
+          artifact_creation_time: "2023-08-08T10:09:44.000+00:00"
         run: |
           echo "registry=${{ env.registry }}" >> "$GITHUB_OUTPUT"
           echo "image_name=${{ env.image_name }}" >> "$GITHUB_OUTPUT"
@@ -118,10 +117,35 @@ jobs:
           echo "job_run_number=${{ env.job_run_number }}" >> "$GITHUB_OUTPUT"
           echo "job_name=${{ env.job_name }}" >> "$GITHUB_OUTPUT"
           echo "repository=${{ env.repository }}" >> "$GITHUB_OUTPUT"
-        
-      - name: REST API Call to push artifacts to SEI
+          echo "digest=${{ env.digest }}" >> "$GITHUB_OUTPUT"
+          echo "type=${{ env.type }}" >> "$GITHUB_OUTPUT"
+          echo "artifact_creation_time=${{ env.artifact_creation_time }}" >> "$GITHUB_OUTPUT"
+
+      - name: Push artifacts to SEI Endpoint
         id: push_artifacts
         env:
-        
-          payload: '{"artifact_creation_time":"${{steps.current_time.outputs.now}}", "job_run_number":"${{ steps.payload.outputs.job_run_number }}", "job_name":"${{ steps.payload.outputs.job_name }}", "image_name":"${{ steps.payload.outputs.image_name }}", "image_url":"${{ steps.payload.outputs.registry }}/${{ steps.payload.outputs.image_name }}", "image_tag":"${{ steps.payload.outputs.tag }}", "integration_id":"${{ env.INTEGRATION_ID }}", "tenant":"${{ env.TENANT }}", "repository":"${{ steps.payload.outputs.repository }}"}'
-        run: curl 'https://651fd848906e276284c39b13.mockapi.io/api/v1/Response' -H 'accept:application/json, text/plain, */*' -H 'accept-language:en-GB,en-US;q=0.9,en;q=0.8' -H 'content-type:application/json' -H 'user-agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36' --data-raw '${{ env.payload }}' --compressed --globoff -o response.json
+          payload: '{"integration_id":"${{ env.INTEGRATION_ID }}","repository":"${{ steps.payload.outputs.repository }}","job_run_number":"${{ steps.payload.outputs.job_run_number }}","job_name":"${{ steps.payload.outputs.job_name }}","artifacts":[{"name":"${{ steps.payload.outputs.image_name }}","location":"${{ steps.payload.outputs.registry }}/${{ steps.payload.outputs.image_name }}","tag":"${{ steps.payload.outputs.tag }}","digest":"${{steps.payload.outputs.digest}}","type":"${{steps.payload.outputs.type}}","artifact_created_at":"${{steps.payload.outputs.artifact_creation_time}}"}]}'
+        run: curl 'https://testapi1.propelo.ai/v1/cicd/push_artifacts' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
+
+      - name: Preparing Payload to push Params
+        id: payload_params
+        env:
+          name: ${{ steps.meta.outputs.labels }}
+          type: ${{ steps.meta.outputs.labels }}
+          value: ${{ steps.meta.outputs.labels }}
+          job_run_number: ${{ github.run_number }}
+          job_name: ${{ github.workflow }}
+          repository: ${{ github.repository }}
+        run: |
+          echo "name=${{ env.name }}" >> "$GITHUB_OUTPUT"
+          echo "type=${{ env.type }}" >> "$GITHUB_OUTPUT"
+          echo "value=${{ env.value }}" >> "$GITHUB_OUTPUT"
+          echo "job_run_number=${{ env.job_run_number }}" >> "$GITHUB_OUTPUT"
+          echo "job_name=${{ env.job_name }}" >> "$GITHUB_OUTPUT"
+          echo "repository=${{ env.repository }}" >> "$GITHUB_OUTPUT"
+
+      - name: Push params to SEI Endpoint
+        id: push_params
+        env:
+          payload: '{"integration_id":"${{ env.INTEGRATION_ID }}","repository":"${{ steps.payload_params.outputs.repository }}","job_run_number":"${{ steps.payload_params.outputs.job_run_number }}","job_name":"${{ steps.payload_params.outputs.job_name }}","params":[{"name":"${{ steps.payload_params.outputs.name }}","type":"${{steps.payload_params.outputs.type}}","value":"${{steps.payload_params.outputs.value}}"}]}'
+        run: curl 'https://testapi1.propelo.ai/v1/cicd/push_job_run_params' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload_params }}' --compressed --globoff
