@@ -110,6 +110,9 @@ jobs:
           digest: ${{ steps.build-and-push.outputs.digest }}
           type: "type1"
           artifact_creation_time: "2023-08-08T10:09:44.000+00:00"
+          artifacts: |-
+            { name: "${{ env.IMAGE_NAME }}", location: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", tag: "${{ steps.meta.outputs.tags }}", diagest: "${{ steps.build-and-push.outputs.digest }}", type: "type1", artifact_creation_time: "2023-08-08T10:09:44.000+00:00" }
+            { name: "${{ env.IMAGE_NAME }}", location: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", tag: "${{ steps.meta.outputs.tags }}", diagest: "${{ steps.build-and-push.outputs.digest }}", type: "type2", artifact_creation_time: "2023-08-08T10:09:44.000+00:00" }
         run: |
           echo "registry=${{ env.registry }}" >> "$GITHUB_OUTPUT"
           echo "image_name=${{ env.image_name }}" >> "$GITHUB_OUTPUT"
@@ -120,6 +123,7 @@ jobs:
           echo "digest=${{ env.digest }}" >> "$GITHUB_OUTPUT"
           echo "type=${{ env.type }}" >> "$GITHUB_OUTPUT"
           echo "artifact_creation_time=${{ env.artifact_creation_time }}" >> "$GITHUB_OUTPUT"
+          echo "artifacts=${{ env.artifacts }}" >> "$GITHUB_OUTPUT"
 
       - name: Push artifacts to SEI Endpoint
         id: push_artifacts
