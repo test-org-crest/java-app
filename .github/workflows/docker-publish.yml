@@ -98,6 +98,13 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "artifacts.json"
+          json: '{"name":"jsdaniell","artifacts":["name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag": "${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type1", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00", "name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag": "${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type2", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00"]}'
+
       - name: Preparing Payload to push artifacts
         id: payload
         env:
@@ -110,9 +117,7 @@ jobs:
           digest: ${{ steps.build-and-push.outputs.digest }}
           type: "type1"
           artifact_creation_time: "2023-08-08T10:09:44.000+00:00"
-          artifacts: |-
-            { name: "${{ env.IMAGE_NAME }}", location: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", tag: "${{ steps.meta.outputs.tags }}", diagest: "${{ steps.build-and-push.outputs.digest }}", type: "type1", artifact_creation_time: "2023-08-08T10:09:44.000+00:00" }
-            { name: "${{ env.IMAGE_NAME }}", location: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", tag: "${{ steps.meta.outputs.tags }}", diagest: "${{ steps.build-and-push.outputs.digest }}", type: "type2", artifact_creation_time: "2023-08-08T10:09:44.000+00:00" }
+
         run: |
           echo "registry=${{ env.registry }}" >> "$GITHUB_OUTPUT"
           echo "image_name=${{ env.image_name }}" >> "$GITHUB_OUTPUT"
@@ -123,12 +128,12 @@ jobs:
           echo "digest=${{ env.digest }}" >> "$GITHUB_OUTPUT"
           echo "type=${{ env.type }}" >> "$GITHUB_OUTPUT"
           echo "artifact_creation_time=${{ env.artifact_creation_time }}" >> "$GITHUB_OUTPUT"
-          echo "artifacts=${{ env.artifacts }}" >> "$GITHUB_OUTPUT"
+          echo "artifacts=$(cat artifacts.json | jq -c '.artifacts')" >> "$GITHUB_OUTPUT"
 
       - name: Push artifacts to SEI Endpoint
         id: push_artifacts
         env:
-          payload: '{"integration_id":"${{ env.INTEGRATION_ID }}","repository":"${{ steps.payload.outputs.repository }}","job_run_number":"${{ steps.payload.outputs.job_run_number }}","job_name":"${{ steps.payload.outputs.job_name }}","artifacts":[{"name":"${{ steps.payload.outputs.image_name }}","location":"${{ steps.payload.outputs.registry }}/${{ steps.payload.outputs.image_name }}","tag":"${{ steps.payload.outputs.tag }}","digest":"${{steps.payload.outputs.digest}}","type":"${{steps.payload.outputs.type}}","artifact_created_at":"${{steps.payload.outputs.artifact_creation_time}}"}]}'
+          payload: '{"integration_id":"${{ env.INTEGRATION_ID }}","repository":"${{ steps.payload.outputs.repository }}","job_run_number":"${{ steps.payload.outputs.job_run_number }}","job_name":"${{ steps.payload.outputs.job_name }}","artifacts": "${{ steps.payload.outputs.artifacts}}"}'
         run: curl 'https://testapi1.propelo.ai/v1/cicd/push_artifacts' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
 
       - name: Preparing Payload to push Params
