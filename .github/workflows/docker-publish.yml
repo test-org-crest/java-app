@@ -125,5 +125,5 @@ jobs:
           #   name: Environment variable name
           #   type: Type of environment variable (default string can be passed)
           #   value: Value of environment variable
-          payload: '{"integration_id":"4717","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","params":[{"name":"${{ steps.meta.outputs.labels }}","type":"${{ steps.meta.outputs.labels }}","value":"${{ steps.meta.outputs.labels }}"},{"name":"${{ steps.meta.outputs.labels }}1","type":"${{ steps.meta.outputs.labels }}1","value":"${{ steps.meta.outputs.labels }}1"}]}'
+          payload: '{"integration_id":"4717","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","params":[{"name":"tag1","type":"string","value":"value1"},{"name":"tag2","type":"string","value":"value2"}]}'
         run: curl '${{ env.base_url }}/v1/cicd/push_job_run_params' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
