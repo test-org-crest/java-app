@@ -103,7 +103,7 @@ jobs:
         uses: jsdaniell/create-json@v1.2.2
         with:
           name: "artifacts.json"
-          json: '{"name":"jsdaniell","artifacts":["name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag": "${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type1", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00", "name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag": "${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type2", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00"]}'
+          json: '{"name":"jsdaniell","artifacts":["name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag":"${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type1", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00", "name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag":"${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type2", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00"]}'
 
       - name: Preparing Payload to push artifacts
         id: payload
