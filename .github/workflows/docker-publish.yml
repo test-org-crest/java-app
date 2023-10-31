@@ -101,7 +101,6 @@ jobs:
       - name: Push artifacts to SEI Endpoint
         id: push_artifacts
         env:
-          integration_id: "4717"
           base_url: "https://testapi1.propelo.ai" # change the URL based on environment e.g. eu1, asia1, etc.
           # List of artifacts can be supported, just need to add similar object of artifact in the below payload variable under the `artifacts` key.
           # Note: name, location and tag of artifact are required, if type, artifact_created_at, digest are not available then remove the fields from the object.
@@ -112,13 +111,12 @@ jobs:
           #   digest: Digest of generated artifact <OPTIONAL>
           #   type: Type of generated artifact <OPTIONAL>
           #   artifact_created_at: Creation time of artifact in ISO format e.g. 2023-01-01T12:00:00.000+00:00 <OPTIONAL>
-          payload: '{"integration_id":"${{ env.integration_id }}","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","artifacts":[{"name":"${{ env.IMAGE_NAME }}","location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}","tag":"${{ steps.meta.outputs.tags }}","digest":"${{ steps.build-and-push.outputs.digest }}","type":"type","artifact_created_at":"2023-08-08T10:09:44.000+00:00"},{"name":"${{ env.IMAGE_NAME }}","location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}","tag":"${{ steps.meta.outputs.tags }}.1","digest":"${{ steps.build-and-push.outputs.digest }}1","type":"type1","artifact_created_at":"2023-08-08T10:10:44.000+00:00"}]}'
+          payload: '{"integration_id":"4717","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","artifacts":[{"name":"${{ env.IMAGE_NAME }}","location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}","tag":"${{ steps.meta.outputs.tags }}","digest":"${{ steps.build-and-push.outputs.digest }}","type":"type","artifact_created_at":"2023-08-08T10:09:44.000+00:00"},{"name":"${{ env.IMAGE_NAME }}","location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}","tag":"${{ steps.meta.outputs.tags }}.1","digest":"${{ steps.build-and-push.outputs.digest }}1","type":"type1","artifact_created_at":"2023-08-08T10:10:44.000+00:00"}]}'
         run: curl '${{ env.base_url }}/v1/cicd/push_artifacts' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
 
       - name: Push params to SEI Endpoint
         id: push_params
         env:
-          integration_id: "4717"
           base_url: "https://testapi1.propelo.ai" # change the URL based on environment e.g. eu1, asia1, etc.
           # All workflow level environment variables can be pushed as job run params.
           # List of job run params can be supported, just need to add similar object of job run param in the below payload variable under the `params` key.
@@ -127,5 +125,5 @@ jobs:
           #   name: Environment variable name
           #   type: Type of environment variable (default string can be passed)
           #   value: Value of environment variable
-          payload: '{"integration_id":"${{ env.integration_id }}","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","params":[{"name":"${{ steps.meta.outputs.labels }}","type":"${{ steps.meta.outputs.labels }}","value":"${{ steps.meta.outputs.labels }}"},{"name":"${{ steps.meta.outputs.labels }}1","type":"${{ steps.meta.outputs.labels }}1","value":"${{ steps.meta.outputs.labels }}1"}]}'
+          payload: '{"integration_id":"4717","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","params":[{"name":"${{ steps.meta.outputs.labels }}","type":"${{ steps.meta.outputs.labels }}","value":"${{ steps.meta.outputs.labels }}"},{"name":"${{ steps.meta.outputs.labels }}1","type":"${{ steps.meta.outputs.labels }}1","value":"${{ steps.meta.outputs.labels }}1"}]}'
         run: curl '${{ env.base_url }}/v1/cicd/push_job_run_params' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
