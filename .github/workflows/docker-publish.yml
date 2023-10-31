@@ -98,63 +98,34 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
-      - name: create-json
-        id: create-json
-        uses: jsdaniell/create-json@v1.2.2
-        with:
-          name: "artifacts.json"
-          json: '{"name":"jsdaniell","artifacts":[{"name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag":"${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type1", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00"}, {"name":"${{ env.IMAGE_NAME }}", "location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}", "tag":"${{ steps.meta.outputs.tags }}", "digest":"${{ steps.build-and-push.outputs.digest }}", "type":"type2", "artifact_creation_time":"2023-08-08T10:09:44.000+00:00"}]}'
-
-      - name: Preparing Payload to push artifacts
-        id: payload
-        env:
-          registry: ${{ env.REGISTRY }}
-          image_name: ${{ env.IMAGE_NAME }}
-          tag: ${{ steps.meta.outputs.tags }}
-          job_run_number: ${{ github.run_number }}
-          job_name: ${{ github.workflow }}
-          repository: ${{ github.repository }}
-          digest: ${{ steps.build-and-push.outputs.digest }}
-          type: "type1"
-          artifact_creation_time: "2023-08-08T10:09:44.000+00:00"
-
-        run: |
-          echo "registry=${{ env.registry }}" >> "$GITHUB_OUTPUT"
-          echo "image_name=${{ env.image_name }}" >> "$GITHUB_OUTPUT"
-          echo "tag=${{ env.tag }}" >> "$GITHUB_OUTPUT"
-          echo "job_run_number=${{ env.job_run_number }}" >> "$GITHUB_OUTPUT"
-          echo "job_name=${{ env.job_name }}" >> "$GITHUB_OUTPUT"
-          echo "repository=${{ env.repository }}" >> "$GITHUB_OUTPUT"
-          echo "digest=${{ env.digest }}" >> "$GITHUB_OUTPUT"
-          echo "type=${{ env.type }}" >> "$GITHUB_OUTPUT"
-          echo "artifact_creation_time=${{ env.artifact_creation_time }}" >> "$GITHUB_OUTPUT"
-          echo "artifacts=$(cat artifacts.json | jq -c '.artifacts')" >> "$GITHUB_OUTPUT"
-
       - name: Push artifacts to SEI Endpoint
         id: push_artifacts
         env:
-          payload: '{"integration_id":"${{ env.INTEGRATION_ID }}","repository":"${{ steps.payload.outputs.repository }}","job_run_number":"${{ steps.payload.outputs.job_run_number }}","job_name":"${{ steps.payload.outputs.job_name }}","artifacts": "${{ steps.payload.outputs.artifacts}}"}'
-        run: curl 'https://testapi1.propelo.ai/v1/cicd/push_artifacts' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
-
-      - name: Preparing Payload to push Params
-        id: payload_params
-        env:
-          name: ${{ steps.meta.outputs.labels }}
-          type: ${{ steps.meta.outputs.labels }}
-          value: ${{ steps.meta.outputs.labels }}
-          job_run_number: ${{ github.run_number }}
-          job_name: ${{ github.workflow }}
-          repository: ${{ github.repository }}
-        run: |
-          echo "name=${{ env.name }}" >> "$GITHUB_OUTPUT"
-          echo "type=${{ env.type }}" >> "$GITHUB_OUTPUT"
-          echo "value=${{ env.value }}" >> "$GITHUB_OUTPUT"
-          echo "job_run_number=${{ env.job_run_number }}" >> "$GITHUB_OUTPUT"
-          echo "job_name=${{ env.job_name }}" >> "$GITHUB_OUTPUT"
-          echo "repository=${{ env.repository }}" >> "$GITHUB_OUTPUT"
+          integration_id: "4717"
+          base_url: "https://api.propelo.ai" # change the URL based on environment e.g. eu1, asia1, etc.
+          # List of artifacts can be supported, just need to add similar object of artifact in the below payload variable under the `artifacts` key.
+          # Note: name, location and tag of artifact are required, if type, artifact_created_at, digest are not available then remove the fields from the object.
+          # Artifact object
+          #   name: Image name of artifact
+          #   location: Location of artifact where artifact stored e.g. ghcr.io/organization/repository
+          #   tag: Tag of image e.g. ghcr.io/organization/repository:v0.1.1 where v0.1.1 is tag/qualifier
+          #   digest: Digest of generated artifact <OPTIONAL>
+          #   type: Type of generated artifact <OPTIONAL>
+          #   artifact_created_at: Creation time of artifact in ISO format e.g. 2023-01-01T12:00:00.000+00:00 <OPTIONAL>
+          payload: '{"integration_id":"${{ env.integration_id }}","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","artifacts":[{"name":"${{ env.IMAGE_NAME }}","location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}","tag":"${{ steps.meta.outputs.tags }}","digest":"${{ steps.build-and-push.outputs.digest }}","type":"type","artifact_created_at":"2023-08-08T10:09:44.000+00:00"},{"name":"${{ env.IMAGE_NAME }}","location":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}","tag":"${{ steps.meta.outputs.tags }}.1","digest":"${{ steps.build-and-push.outputs.digest }}1","type":"type1","artifact_created_at":"2023-08-08T10:10:44.000+00:00"}]}'
+        run: curl '${{ env.base_url }}/v1/cicd/push_artifacts' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
 
       - name: Push params to SEI Endpoint
         id: push_params
         env:
-          payload: '{"integration_id":"${{ env.INTEGRATION_ID }}","repository":"${{ steps.payload_params.outputs.repository }}","job_run_number":"${{ steps.payload_params.outputs.job_run_number }}","job_name":"${{ steps.payload_params.outputs.job_name }}","params":[{"name":"${{ steps.payload_params.outputs.name }}","type":"${{steps.payload_params.outputs.type}}","value":"${{steps.payload_params.outputs.value}}"}]}'
-        run: curl 'https://testapi1.propelo.ai/v1/cicd/push_job_run_params' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
+          integration_id: "4717"
+          base_url: "https://api.propelo.ai" # change the URL based on environment e.g. eu1, asia1, etc.
+          # All workflow level environment variables can be pushed as job run params.
+          # List of job run params can be supported, just need to add similar object of job run param in the below payload variable under the `params` key.
+          # Note: name, value and type of param are required.
+          # Param object
+          #   name: Environment variable name
+          #   type: Type of environment variable (default string can be passed)
+          #   value: Value of environment variable
+          payload: '{"integration_id":"${{ env.integration_id }}","repository":"${{ github.repository }}","job_run_number":"${{ github.run_number }}","job_name":"${{ github.workflow }}","params":[{"name":"${{ steps.meta.outputs.labels }}","type":"${{ steps.meta.outputs.labels }}","value":"${{ steps.meta.outputs.labels }}"},{"name":"${{ steps.meta.outputs.labels }}1","type":"${{ steps.meta.outputs.labels }}1","value":"${{ steps.meta.outputs.labels }}1"}]}'
+        run: curl '${{ env.base_url }}/v1/cicd/push_job_run_params' -H 'accept:application/json' -H 'authorization:Apikey ${{ secrets.SEI_API_KEY }}' -H 'content-type:application/json' --data-raw '${{ env.payload }}' --compressed --globoff
