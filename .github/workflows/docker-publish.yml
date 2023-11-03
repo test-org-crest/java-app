@@ -96,3 +96,10 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+  print:
+    runs-on: ubuntu-latest
+    steps:
+      - name: print the output of build stage
+        env:
+          digest: ${{jobs.build.steps.meta.outputs.tags}}
+        run: echo "${{env.digest}}"
