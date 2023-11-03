@@ -98,8 +98,9 @@ jobs:
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
   print:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: print the output of build stage
         env:
-          digest: ${{stages.build.steps.meta.outputs.tags}}
+          digest: ${{needs.build.steps.meta.outputs.tags}}
         run: echo "${{env.digest}}"
