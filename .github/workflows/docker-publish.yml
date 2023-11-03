@@ -101,5 +101,5 @@ jobs:
     steps:
       - name: print the output of build stage
         env:
-          digest: ${{jobs.build.steps.meta.outputs.tags}}
+          digest: ${{stages.build.steps.meta.outputs.tags}}
         run: echo "${{env.digest}}"
